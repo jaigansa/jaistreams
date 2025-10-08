@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@200;300;400;500;600;700;800&family=Teko:wght@300..700&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+
+@theme {
+  --font-teko: "Teko", sans-serif;
+  --font-mukta-malar: "Mukta Malar", sans-serif;
+
+  --color-baseBg: oklch(0.98 0.01 260);  
+  --color-surface: oklch(1 0 0);         
+  --color-text: oklch(0.12 0 0);         
+  --color-text-low: oklch(0.4 0 0);      
+  
+  --color-primary: oklch(0.55 0.15 180);   
+  --color-primary-fg: oklch(0.95 0.01 180);
+  --color-accent-error: oklch(0.6 0.18 20);
+
+  --color-dwhite: #ffffff; 
+}
+
+@layer theme {
+  .dark {
+    --color-baseBg: oklch(0.18 0.03 260);  /* Dark BG */
+    --color-surface: oklch(0.25 0.04 260); /* Slightly Lighter Dark Gray for elevated elements */
+    --color-text: oklch(0.90 0 0);         /* Light/Off-White Text */
+    --color-text-low: oklch(0.65 0 0);     /* Lighter Gray for secondary text */
+    
+    --color-dwhite: #ffffff;
+  }
+}
+
+
+/* Add to your global CSS */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+
+
+
+
+/* Custom styles can be added here */
+
+@keyframes slide-topper {
+    0% {
+      transform: translateY(220px); 
+    }
+    3% {
+      transform: translateY(0); 
+    }
+
+
+    50% {
+      transform: translateY(0);
+    }
+
+    53% {
+      transform: translateY(220px);
+    }
+
+    100% {
+      transform: translateY(220px); /* Slide out */
+    }
+  }
+  
+  .slidetop-animate {
+    animation: slide-topper 60s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    animation-play-state: running;
+  }
+
+
+
