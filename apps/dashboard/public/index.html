@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link href="./output.css" rel="stylesheet" />
+
+</head>
+
+<body class="flex flex-col items-center bg-baseBg  text-text min-h-screen p-4">
+    <button id="theme-toggle" 
+        class="p-3 m-4 rounded-full transition-colors duration-300 shadow-lg 
+               bg-app-surface text-app-text hover:bg-app-primary hover:text-white 
+               fixed top-4 right-4 z-50">
+  
+  <svg id="sun-icon" class="w-6 h-6 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+  </svg>
+  
+  <svg id="moon-icon" class="w-6 h-6 dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+  </svg>
+</button>
+
+  <header class="w-full mb-6 flex justify-center">
+    <div class="flex flex-col items-center font-teko bg-app-surface text-text text-4xl p-4 rounded-xl shadow-2xl w-full max-w-xl">
+
+      <section class="flex flex-col items-center mb-4">
+        <div id="avatar-image" class="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-app-primary bg-app-primary/60"></div>
+        <div id="channel-title" class="font-bold text-5xl mt-2 uppercase ">JAI GAME</div>
+      </section>
+
+      <div class="grid grid-cols-2 gap-4 text-2xl w-full text-center">
+        <section class="flex flex-col items-center bg-red-900 p-2 rounded-lg">
+          <div class="animate-pulse text-red-300">SUBSCRIBERS</div>
+          <div id="subscribers-count" class="font-bold text-3xl text-dwhite">--</div>
+        </section>
+
+        <section class="flex flex-col items-center bg-blue-900 p-2 rounded-lg">
+          <div class="text-blue-300">Channel Views</div>
+          <div id="total-channel-views" class="font-bold text-3xl  text-dwhite">--</div>
+        </section>
+
+        <section class="col-span-2 flex flex-col items-center bg-green-900 p-2 rounded-lg">
+          <div class="text-green-300">Total Videos</div>
+          <div id="total-channel-videos" class="font-bold text-3xl  text-dwhite">--</div>
+        </section>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full mb-6 flex justify-center">
+    <div class="flex flex-col items-center rounded-xl w-full max-w-xl">
+      <div id="qrcode-container" class="flex flex-col items-center rounded-xl bg-app-surface p-4 shadow-lg w-full">
+        <div id="qrcode" class="flex justify-center rounded-xl items-center border-6 border-white bg-white">
+          <p class="text-lg text-gray-400">Loading QR...</p>
+        </div>
+        <h2 id="qr-label" class="text-4xl font-teko font-bold text-center uppercase text-app-primary mt-2"></h2>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="w-full flex justify-center">
+    <div class="flex flex-col items-center  text-app-text rounded-xl  w-full max-w-xl shadow-2xl space-y-6">
+      <div class="w-full border-gray-600">
+        <h1 class="text-5xl font-teko font-extrabold text-center uppercase text-app-primary">Missions</h1>
+        <div id="missions" class="w-full min-h-[100px] flex items-center justify-center">
+        </div>
+        <div id="mission-buttons" class="flex justify-center mt-2"></div>
+      </div>
+
+        <div id="game-title" class="w-full min-h-[50px] flex items-center justify-center m-0">
+        </div>
+        <div id="game-button" class="flex justify-center "></div>
+
+      </div>
+
+  </footer>
+    <script src="./app.js"></script>
+</body>
+
+</html>

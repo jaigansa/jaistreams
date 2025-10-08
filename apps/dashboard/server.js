@@ -24,6 +24,7 @@ app.get('/get-channel-data', async (req, res) => {
     });
 
     const channel = response.data.items[0];
+    console.log (channel);
     if (!channel) return res.status(404).send('Channel not found');
 
     const channelData = {
