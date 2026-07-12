@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streams Manager - Admin Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen p-3 md:p-4 flex flex-col items-center">
+  
+  <div class="w-full max-w-4xl">
+    
+    <!-- Pro App Header -->
+    <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-zinc-800 pb-6 mb-8 w-full">
+      <div>
+        <div class="flex items-center space-x-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-semibold text-emerald-500 uppercase tracking-wider">Live System Active</span>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight text-white mt-1">Admin Console</h1>
+        <p class="text-sm text-zinc-400 mt-1">Configure and manage stream overlays, game listings, and live objectives.</p>
+      </div>
+      <div class="flex space-x-3 mt-4 sm:mt-0">
+        <a href="/" target="_blank" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 rounded-lg text-xs font-semibold transition duration-200">
+          View Dashboard
+        </a>
+        <a href="/overlay.html" target="_blank" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition duration-200 shadow-sm shadow-indigo-900/30">
+          Open OBS Overlay
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      
+      <!-- Left Column: Settings Cards -->
+      <div class="lg:col-span-1 space-y-4">
+        
+        <!-- Game Configuration -->
+        <section class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <!-- Gamepad Icon -->
+              <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+              </svg>
+              <h2 class="text-base font-semibold text-white">Games</h2>
+            </div>
+            <button id="add-game-btn" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[10px] font-semibold transition duration-150 shadow-sm">
+              + Add
+            </button>
+          </div>
+          <div id="games-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- Social Channels -->
+        <section class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <!-- Link Icon -->
+              <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 002.502-2.502m0 0l.758-.758a4 4 0 015.656 5.656l-4 4a4 4 0 01-5.656 0l-1.1-1.1"></path>
+              </svg>
+              <h2 class="text-base font-semibold text-white">Social Channels</h2>
+            </div>
+            <button id="add-social-btn" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[10px] font-semibold transition duration-150 shadow-sm">
+              + Add
+            </button>
+          </div>
+          <div id="social-links-list" class="space-y-3">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- OBS Widgets Copy -->
+        <section class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-sm space-y-4">
+          <div class="flex items-center space-x-2">
+            <!-- Clipboard Icon -->
+            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+            </svg>
+            <h2 class="text-base font-semibold text-white">OBS Widgets</h2>
+          </div>
+          <div class="space-y-3" id="obs-widgets-list">
+            <!-- Dynamically populated by admin.js -->
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Active Missions Form -->
+      <div class="lg:col-span-2 space-y-6">
+        <section class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-sm flex flex-col flex-1">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-4 mb-4">
+            <div class="flex items-center space-x-2">
+              <!-- Target Icon -->
+              <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <h2 class="text-base font-semibold text-white">Stream Objectives</h2>
+            </div>
+            <button id="add-mission-btn" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition duration-150 shadow-sm">
+              Add Objective
+            </button>
+          </div>
+          
+          <div id="missions-list" class="flex-1 overflow-y-auto pr-2">
+            <!-- Dynamically populated -->
+            <p class="text-zinc-400 text-sm text-center py-6">Loading objectives...</p>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <!-- Credentials Config Panel -->
+    <section class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-sm mt-6">
+      <div class="flex items-center space-x-2 border-b border-zinc-800 pb-3 mb-4">
+        <!-- Shield Icon -->
+        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+        </svg>
+        <h2 class="text-base font-semibold text-white">API & Environment Configuration</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-zinc-400 mb-1.5">Server Port</label>
+          <input type="number" id="config-port" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-zinc-100 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="3000">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-zinc-400 mb-1.5">YouTube Channel ID</label>
+          <input type="text" id="config-channel-id" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-zinc-100 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="UC...">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-zinc-400 mb-1.5">YouTube API Key</label>
+          <input type="password" id="config-api-key" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-zinc-100 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="AIzaSy...">
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end">
+        <button id="save-config-btn" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-750 rounded-lg text-xs font-semibold transition duration-150">
+          Save API Config
+        </button>
+      </div>
+    </section>
+
+    <!-- Save Button Container -->
+    <div class="mt-8 flex justify-end">
+      <button id="save-all-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition duration-150 shadow-sm shadow-indigo-900/30 flex items-center">
+        <span>💾</span> <span class="ml-2">Apply Stream Changes</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 px-5 py-3 rounded-lg text-white font-medium text-sm transform translate-y-20 opacity-0 transition duration-200 shadow-lg z-50 flex items-center space-x-2 bg-zinc-900 border border-zinc-800">
+    <!-- Dynamic content -->
+  </div>
+
+  <script src="./admin.js"></script>
+</body>
+</html>

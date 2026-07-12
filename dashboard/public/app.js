@@ -1,4 +1,3 @@
-console.log ("app.js");
 // ================= Shared Data =================
 let gameInfo = [];
 let missions = [];
@@ -21,8 +20,8 @@ async function fetchChannelData() {
     return {
       avatarUrl: data.avatarUrl,
       title: data.title,
-      subscribers: formatCount(data.subscribers),
-      views: formatCount(data.views),
+      subscribers: formatCount(Number(data.subscribers)),
+      views: formatCount(Number(data.views)),
       videos: data.videos,
     };
   } catch (error) {
@@ -43,56 +42,70 @@ function formatCount(number) {
   return num.toFixed(1) + suffixes[idx];
 }
 
-// ================= DOM Elements =================
-const avatarDiv = document.getElementById("avatar-image");
-const titleDiv = document.getElementById("channel-title");
-const subscribersDiv = document.getElementById("subscribers-count");
-const totalChannelViewsDiv = document.getElementById("total-channel-views");
-const totalChannelVideosDiv = document.getElementById("total-channel-videos");
-
 // ================= Update Channel Info =================
 async function updateChannelInfo() {
   const data = await fetchChannelData();
   if (!data) return;
 
-  avatarDiv.innerHTML = `<img src="${data.avatarUrl}" alt="Avatar" class="rounded-full" />`;
-  titleDiv.textContent = data.title;
-  subscribersDiv.textContent = data.subscribers;
-  totalChannelViewsDiv.textContent = data.views;
-  totalChannelVideosDiv.textContent = data.videos;
+  const avatarDiv = document.getElementById("avatar-container");
+  if (avatarDiv) avatarDiv.innerHTML = `<img src="${data.avatarUrl}" alt="Avatar" class="w-full h-full object-cover" />`;
+  
+  const titleDiv = document.getElementById("channel-title");
+  if (titleDiv) titleDiv.textContent = data.title;
+  
+  const subDiv = document.getElementById("subscriber-count");
+  if (subDiv) subDiv.textContent = data.subscribers;
+  
+  const viewsDiv = document.getElementById("view-count");
+  if (viewsDiv) viewsDiv.textContent = data.views;
+  
+  const videosDiv = document.getElementById("video-count");
+  if (videosDiv) videosDiv.textContent = data.videos;
 }
 
 // ================= Load Data =================
 async function loadData() {
   try {
-    const response = await fetch("data/db.json");
+    const response = await fetch("data/db.json?t=" + Date.now());
     const allData = await response.json();
 
-    gameInfo = allData.game_info.filter(g => g.status === "Show");
-    missions = allData.missions.filter(m => m.progress.status === "Show");
-    socialLinks = [
-      { name: "YouTube", url: allData.social_links.youtube },
-      { name: "Website", url: allData.social_links.website },
-      { name: "Instagram", url: allData.social_links.instagram },
-    ];
+    const newGameInfo = allData.game_info.filter(g => g.status === "Show");
+    const newMissions = allData.missions.filter(m => m.progress && m.progress.status === "Show");
+    
+    // Dynamically read ALL social link keys from db.json
+    const newSocialLinks = [];
+    if (allData.social_links) {
+      for (const [name, url] of Object.entries(allData.social_links)) {
+        if (url) newSocialLinks.push({ name, url });
+      }
+    }
 
-    renderGame();
-    renderMission();
-    startMissionLoop();
-    startSocialLoop();
+    // Update Game Info if changed
+    if (JSON.stringify(newGameInfo) !== JSON.stringify(gameInfo)) {
+      gameInfo = newGameInfo;
+      selectedGameIndex = 0;
+      renderGame();
+    }
+
+    // Update Social Links if changed
+    if (JSON.stringify(newSocialLinks) !== JSON.stringify(socialLinks)) {
+      socialLinks = newSocialLinks;
+      socialIndex = 0;
+      startSocialLoop();
+    }
+
+    // Update Missions if changed/updated
+    if (JSON.stringify(newMissions) !== JSON.stringify(missions)) {
+      missions = newMissions;
+      selectedMissionIndex = 0;
+      renderMission();
+      startMissionLoop();
+    } else {
+      renderMission();
+    }
+
   } catch (error) {
     console.error("Error loading data:", error);
-  }
-}
-
-// ================= General Render Function =================
-function selectItem(type, direction = 1) {
-  if (type === "game" && gameInfo.length) {
-    selectedGameIndex = (selectedGameIndex + direction + gameInfo.length) % gameInfo.length;
-    renderGame();
-  } else if (type === "mission" && missions.length) {
-    selectedMissionIndex = (selectedMissionIndex + direction + missions.length) % missions.length;
-    renderMission();
   }
 }
 
@@ -102,25 +115,29 @@ function renderGame() {
   const buttons = document.getElementById("game-button");
 
   if (!gameInfo.length) {
-    container.innerHTML = "<p>No games available</p>";
-    buttons.innerHTML = "";
+    if (container) container.innerHTML = "<p class='text-zinc-500 text-sm'>No games available</p>";
+    if (buttons) buttons.innerHTML = "";
     return;
   }
 
   const game = gameInfo[selectedGameIndex];
 
-  container.innerHTML = `
-    <div class="text-center font-teko">
-      <h2 class="text-2xl tracking-widest  font-bold">${game.title} ${game.version}</h2>
-    </div>
-  `;
+  if (container) {
+    container.innerHTML = `
+      <div class="text-center">
+        <h2 class="text-3xl tracking-tight font-bold text-white">${game.title} <span class="text-indigo-400 text-xl font-semibold">${game.version}</span></h2>
+      </div>
+    `;
+  }
 
-  buttons.innerHTML = `
-    <div class="inline-flex items-center justify-center w-full space-x-2">
-      <button onclick="selectItem('game', -1)" class="w-3 h-3 bg-text hover:bg-text-low flex items-center justify-center rounded-full"></button>
-      <button onclick="selectItem('game', 1)" class="w-3 h-3 bg-text hover:bg-text-low flex items-center justify-center rounded-full"></button>
-    </div>
-  `;
+  if (buttons) {
+    buttons.innerHTML = `
+      <div class="inline-flex items-center justify-center w-full space-x-3 mt-4">
+        <button onclick="selectItem('game', -1)" class="w-2.5 h-2.5 bg-zinc-600 hover:bg-zinc-400 transition-colors flex items-center justify-center rounded-full"></button>
+        <button onclick="selectItem('game', 1)" class="w-2.5 h-2.5 bg-zinc-600 hover:bg-zinc-400 transition-colors flex items-center justify-center rounded-full"></button>
+      </div>
+    `;
+  }
 }
 
 // ================= Render Mission =================
@@ -129,98 +146,146 @@ function renderMission() {
   const buttons = document.getElementById("mission-buttons");
 
   if (!missions.length) {
-    container.innerHTML = "<p>No missions available</p>";
-    buttons.innerHTML = "";
+    if (container) container.innerHTML = "<p class='text-zinc-500 text-sm'>No objectives available</p>";
+    if (buttons) buttons.innerHTML = "";
     return;
   }
 
   const mission = missions[selectedMissionIndex];
-  const progress = Math.floor((mission.progress.current / mission.progress.total) * 100);
+  const progress = Math.floor((mission.progress.current / (mission.progress.total || 1)) * 100);
 
-  container.innerHTML = `
-    <div class="text-center font-teko text-2xl">
-      <h2 class="text-4xl">${mission.title}</h2>
-      <p>${mission.objective}</p>
-      <p>Reward: ${mission.rewards}</p>
-      <p>Progress: ${mission.progress.current}/${mission.progress.total}</p>
-      <div class="w-[90%] mx-auto bg-surface h-4  rounded-full">
-        <div class="bg-text h-full rounded-full" style="width: ${progress}%"></div>
+  if (container) {
+    container.innerHTML = `
+      <div class="w-full text-center">
+        <h2 class="text-3xl font-bold text-white mb-2">${mission.title}</h2>
+        <p class="text-zinc-400 text-sm mb-4 max-w-lg mx-auto">${mission.objective}</p>
+        
+        <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2 px-1">
+          <span>Reward: <strong class="text-emerald-400">${mission.rewards}</strong></span>
+          <span>Progress: <strong class="text-indigo-400">${mission.progress.current}/${mission.progress.total}</strong></span>
+        </div>
+        
+        <div class="w-full bg-zinc-950 border border-zinc-800 h-4 rounded-full overflow-hidden">
+          <div class="bg-indigo-500 h-full rounded-full transition-all duration-500" style="width: ${progress}%"></div>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 
-  buttons.innerHTML = `
-    <div class="inline-flex  items-center justify-center w-full space-x-2">
-      <button onclick="selectItem('mission', -1)" class="w-3 h-3  bg-text hover:bg-text-low flex items-center justify-center rounded-full"></button>
-      <button onclick="selectItem('mission', 1)" class="w-3 h-3  bg-text hover:bg-text-low flex items-center justify-center rounded-full"></button>
-    </div>
-  `;
+  if (buttons) {
+    buttons.innerHTML = `
+      <div class="inline-flex items-center justify-center space-x-2">
+        <button onclick="selectItem('mission', -1)" class="w-2.5 h-2.5 bg-zinc-600 hover:bg-zinc-400 transition flex items-center justify-center rounded-full"></button>
+        <button onclick="selectItem('mission', 1)" class="w-2.5 h-2.5 bg-zinc-600 hover:bg-zinc-400 transition flex items-center justify-center rounded-full"></button>
+      </div>
+    `;
+  }
 }
 
 // ================= Auto-loop Missions =================
 function startMissionLoop() {
-  if (!missions.length) return;
-
   if (missionInterval) clearInterval(missionInterval);
-  missionInterval = setInterval(() => selectItem("mission", 1), 6000);
-}
+  if (missions.length <= 1) return;
 
-// ================= QR Code & Social =================
-function createQRCode(divId, text, label) {
-  const qrDiv = document.getElementById(divId);
-  qrDiv.innerHTML = "";
-
-  const qrImage = document.createElement("img");
-  qrImage.src = `/qr?text=${encodeURIComponent(text)}`;
-  qrImage.alt = "QR Code";
-  qrImage.className = "m-auto rounded-xl";
-  qrImage.width = 200;
-  qrImage.height = 200;
-
-  qrDiv.appendChild(qrImage);
-
-  document.getElementById("qr-label").textContent = label;
-}
-
-function startSocialLoop() {
-  if (!socialLinks.length) return;
-
-  if (socialInterval) clearInterval(socialInterval);
-  createQRCode("qrcode", socialLinks[socialIndex].url, socialLinks[socialIndex].name);
-
-  socialInterval = setInterval(() => {
-    socialIndex = (socialIndex + 1) % socialLinks.length;
-    createQRCode("qrcode", socialLinks[socialIndex].url, socialLinks[socialIndex].name);
+  missionInterval = setInterval(() => {
+    selectedMissionIndex = (selectedMissionIndex + 1) % missions.length;
+    renderMission();
   }, 10000);
 }
 
-// This script should be included via your app.js
-const toggleButton = document.getElementById('theme-toggle');
-const htmlElement = document.documentElement; 
+// ================= Auto-loop Socials =================
+function startSocialLoop() {
+  if (socialInterval) clearInterval(socialInterval);
+  
+  if (socialLinks.length === 0) {
+    const qrContainer = document.getElementById("qrcode-container");
+    const label = document.getElementById("social-label");
+    if (qrContainer) qrContainer.style.display = "none";
+    if (label) label.textContent = "No Links";
+    return;
+  }
+  
+  const qrContainer = document.getElementById("qrcode-container");
+  if (qrContainer) qrContainer.style.display = "flex";
 
-// Initial setup to load theme from localStorage or system preference
-const currentTheme = localStorage.getItem('theme');
-const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  renderSocial();
 
-if (currentTheme === 'dark' || (!currentTheme && systemDark)) {
-  htmlElement.classList.add('dark');
-} else {
-  htmlElement.classList.remove('dark');
+  if (socialLinks.length <= 1) return;
+
+  socialInterval = setInterval(() => {
+    socialIndex = (socialIndex + 1) % socialLinks.length;
+    renderSocial();
+  }, 10000);
 }
 
-// Click event to switch theme
-toggleButton.addEventListener('click', () => {
-  if (htmlElement.classList.contains('dark')) {
-    htmlElement.classList.remove('dark');
-    localStorage.setItem('theme', 'light');
-  } else {
-    htmlElement.classList.add('dark');
-    localStorage.setItem('theme', 'dark');
+// ================= Render QR =================
+function renderSocial() {
+  const social = socialLinks[socialIndex];
+  if (!social) return;
+
+  const qrImage = document.getElementById("qrcode");
+  const labelDiv = document.getElementById("social-label");
+  const buttonsDiv = document.getElementById("qr-buttons");
+
+  if (qrImage) {
+    qrImage.classList.remove("fade-in");
+    qrImage.classList.add("fade-out");
   }
-});
+
+  setTimeout(() => {
+    if (qrImage) {
+      qrImage.src = `/qr?text=${encodeURIComponent(social.url)}`;
+      qrImage.classList.remove("fade-out");
+      qrImage.classList.add("fade-in");
+      qrImage.classList.remove("hidden");
+    }
+
+    if (labelDiv) {
+      labelDiv.textContent = social.name;
+      labelDiv.className = "text-xl font-bold tracking-tight transition-colors duration-300";
+      if (social.name.toLowerCase() === "youtube") labelDiv.classList.add("text-rose-500");
+      else if (social.name.toLowerCase() === "instagram") labelDiv.classList.add("text-pink-500");
+      else labelDiv.classList.add("text-indigo-400");
+    }
+
+    if (buttonsDiv && socialLinks.length > 1) {
+      buttonsDiv.innerHTML = `
+        <button onclick="selectItem('social', -1)" class="w-2 h-2 bg-zinc-600 hover:bg-zinc-400 rounded-full transition"></button>
+        <button onclick="selectItem('social', 1)" class="w-2 h-2 bg-zinc-600 hover:bg-zinc-400 rounded-full transition"></button>
+      `;
+    } else if (buttonsDiv) {
+      buttonsDiv.innerHTML = "";
+    }
+  }, 400);
+}
+
+// ================= Manual Selection =================
+window.selectItem = function (type, direction) {
+  if (type === "game") {
+    if (gameInfo.length === 0) return;
+    selectedGameIndex = (selectedGameIndex + direction + gameInfo.length) % gameInfo.length;
+    renderGame();
+  } else if (type === "mission") {
+    if (missions.length === 0) return;
+    selectedMissionIndex = (selectedMissionIndex + direction + missions.length) % missions.length;
+    renderMission();
+    startMissionLoop();
+  } else if (type === "social") {
+    if (socialLinks.length === 0) return;
+    socialIndex = (socialIndex + direction + socialLinks.length) % socialLinks.length;
+    renderSocial();
+    startSocialLoop();
+  }
+};
 
 // ================= Initialize =================
 document.addEventListener("DOMContentLoaded", () => {
   updateChannelInfo();
   loadData();
+
+  // Refresh YouTube stats every 5 minutes
+  setInterval(updateChannelInfo, 300000);
+
+  // Poll database updates every 2 seconds
+  setInterval(loadData, 2000);
 });
